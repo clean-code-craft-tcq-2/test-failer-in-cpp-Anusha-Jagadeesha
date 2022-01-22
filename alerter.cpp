@@ -2,33 +2,47 @@
 #include <assert.h>
 
 int alertFailureCount = 0;
+class CNetworkStatus{
+    public:
+    virtual int networkAlertStub(float f_celcius) = 0;
+};
 
-int networkAlertStub(float celcius) {
-    std::cout << "ALERT: Temperature is " << celcius << " celcius.\n";
-    // Return 200 for ok
-    // Return 500 for not-ok
-    // stub always succeeds and returns 200
+class CNetWorkAlertSuccessStub : public CNetworkStatus{
+    public:
+    int networkAlertStub(float f_celcius){
+    std::cout << "ALERT: Temperature is " << f_celcius << " celcius.\n";
     return 200;
+    }
+};
+
+class CNetWorkAlertFailureStub : public CNetworkStatus{
+    public:
+    int networkAlertStub(float f_celcius){
+    std::cout << "ALERT: Temperature is " << f_celcius << " celcius.\n";
+    return 500;
+    }
+};
+
+float convertFarenheitToCelcius(float farenhit){
+    return ((farenhit - 32) * 5 / 9);
 }
 
-void alertInCelcius(float farenheit) {
-    float celcius = (farenheit - 32) * 5 / 9;
-    int returnCode = networkAlertStub(celcius);
-    if (returnCode != 200) {
-        // non-ok response is not an error! Issues happen in life!
-        // let us keep a count of failures to report
-        // However, this code doesn't count failures!
-        // Add a test below to catch this bug. Alter the stub above, if needed.
+void alertInCelcius(float farenheit, CNetworkStatus &f_networkStatus) {
+    float celcius = convertFarenheitToCelcius(farenheit);
+    f_networkStatus.networkAlertStub(celcius);
+    int returnCodeFailure = f_networkStatus.networkAlertStub(celcius);
+    if (returnCodeFailure != 200) {
         alertFailureCount += 0;
     }
 }
 
 int main() {
-    alertInCelcius(400.5);
-    assert(alertFailureCount == 1);
-    alertInCelcius(303.6);
+    CNetWorkAlertSuccessStub m_networkAlertSuccess;
+    CNetWorkAlertFailureStub m_networkAlertFailure;
+    alertInCelcius(400.5, m_networkAlertSuccess);
     assert(alertFailureCount == 0);
-    std::cout << alertFailureCount << " alerts failed.\n";
-    std::cout << "All is well (maybe!)\n";
+    alertInCelcius(303.6, m_networkAlertFailure);
+    assert(alertFailureCount == 1);
     return 0;
 }
+
