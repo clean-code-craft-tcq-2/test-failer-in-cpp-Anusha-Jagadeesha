@@ -1,48 +1,38 @@
 #include <iostream>
 #include <assert.h>
 #include <string>
+#include <cstring>
 
-int printColorMapForSingleDigit(){
+std::string getColorPair(int majorColorId, int minorColorId){
     const char *majorColor[] = {"White", "Red", "Black", "Yellow", "Violet"};
     const char *minorColor[] = {"Blue", "Orange", "Green", "Brown", "Slate"};
-    int i = 0, j = 0;
-    for (i = 0; i < 2; i++){
-        for (j = 0; j < 5; j++){
-            std::cout << i * 5 + j << "  | " << majorColor[i] << " | " << minorColor[i] << "\n";
-        }
-    }
-    return i * j;
+    int pairNumber = (((majorColorId * 5) + minorColorId) + 1) ;
+    static char colurPair[100];
+    sprintf(colurPair,"%d\t|\t%s\t|\t%s",pairNumber,majorColor[majorColorId],minorColor[minorColorId]);
+    std::string retColorPair = colurPair;
+    return retColorPair;
 }
-int printColorMapForDoubleDigit(){
-    const char *majorColor[] = {"White", "Red", "Black", "Yellow", "Violet"};
-    const char *minorColor[] = {"Blue", "Orange", "Green", "Brown", "Slate"};
-    int i = 0, j = 0;
-    for (i = 2; i < 5; i++){
-        for (j = 0; j < 5; j++){
-            std::cout << i * 5 + j << " | " << majorColor[i] << " | " << minorColor[i] << "\n";
+
+int printColorMap(){
+    int majorColorIdx = 0, minorColorIdx = 0;
+    for (majorColorIdx = 0; majorColorIdx < 5; majorColorIdx++){
+        for (minorColorIdx = 0; minorColorIdx < 5; minorColorIdx++){
+            std::cout << getColorPair(majorColorIdx,minorColorIdx) << std::endl;
         }
     }
-    return i * j;
+    return majorColorIdx * minorColorIdx;
 }
-std::string getColorPairForPairNumber(int pairNumber){
-    const char *majorColor[] = {"White", "Red", "Black", "Yellow", "Violet"};
-    const char *minorColor[] = {"Blue", "Orange", "Green", "Brown", "Slate"};
-    for (int i = 0; i < 5; i++){
-        for (int j = 0; j < 5; j++){
-            if (pairNumber == (i * 5 + j)){
-                std::string returnMajorColor = majorColor[i];
-                std::string returnMinorColor = minorColor[i];
-                return (returnMajorColor.append(" | ").append(returnMinorColor));
-            }
-        }
-    }
-    return "";
+
+void testPrintColorMap(){
+    assert(printColorMap() == 25);
+    assert(getColorPair(0,0).compare("1	|	White	|	Blue") == 0);
+    assert(getColorPair(1,4).compare("10	|	Red	|	Slate") == 0);
+    assert(getColorPair(3,0).compare("16	|	Yellow	|	Blue") == 0);
+    assert(getColorPair(4,0).compare("21	|	Violet	|	Blue") == 0);
+    assert(getColorPair(4,4).compare("25	|	Violet	|	Slate") == 0);
 }
 
 int main(){
-    assert(printColorMapForSingleDigit() == 10);
-    assert(printColorMapForDoubleDigit() == 25);
-    assert(getColorPairForPairNumber(0) == "");
-    assert(getColorPairForPairNumber(25) == "Violet | Slate");
+    testPrintColorMap();
     return 0;
 }
